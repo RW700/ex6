@@ -809,6 +809,12 @@ void openPokedexMenu() {
     // get the new node's data
     printf("Your name: ");
     newOwner->ownerName = getDynamicInput();
+    if (findOwnerByName(newOwner->ownerName) != NULL) {
+        printf("Owner already exists.\n");
+        free(newOwner->ownerName);
+        free(newOwner);
+        return;
+    }
     printf("Choose Starter:\n1. Bulbasaur\n2. Charmander\n3. Squirtle\n");
     int choice = readIntSafe("Your choice: ");
     if (choice < BULBASAUR_OPT || choice > SQUIRTLE_OPT) {
