@@ -250,7 +250,7 @@ void deletePokedex() {
             cur = cur->next;
         }
     }
-    printf("\nDeleting %s's entire Pokedex...\n", cur->ownerName);
+    printf("Deleting %s's entire Pokedex...\n", cur->ownerName);
 
     // account for if this is the global head
     if (cur == ownerHead) {
