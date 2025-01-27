@@ -813,9 +813,10 @@ void openPokedexMenu() {
     printf("Your name: ");
     newOwner->ownerName = getDynamicInput();
     if (findOwnerByName(newOwner->ownerName) != NULL) {
-        printf("Owner already exists.\n");
+        printf("Owner '%s' already exists.\n", newOwner->ownerName);
         free(newOwner->ownerName);
         free(newOwner);
+        newOwner = NULL;
         return;
     }
     printf("Choose Starter:\n1. Bulbasaur\n2. Charmander\n3. Squirtle\n");
@@ -1107,18 +1108,46 @@ void displayMenu(OwnerNode *owner)
 // --------------------------------------------------------------
 void enterExistingPokedexMenu()
 {
+    // Check if there are any owners
+    if (ownerHead == NULL) {
+        printf("No existing Pokedexes.\n");
+        return;
+    }
+
     // list owners
     printf("\nExisting Pokedexes (circular list):\n");
-
     // print by looping through each owner - while doesn't equal head, print next etc
     printAllOwners();
 
     // get user input for which owner by list number starting at 1
     int ownerChoice = readIntSafe("Choose a Pokedex by number: ");
     OwnerNode *cur = ownerHead;
+
+    if (cur==NULL) {
+        printf("No existing Pokedexes.\n");
+        return;
+    }
+
+    // Calculate the number of owners
+    int ownerCount = 1;
+    OwnerNode *temp = ownerHead;
+    while (temp->next != ownerHead) {
+        ownerCount++;
+        temp = temp->next;
+    }
+
+    // Use modulo to wrap around if ownerChoice exceeds the number of owners
+    ownerChoice = (ownerChoice - 1) % ownerCount + 1;
+
+
     if (ownerChoice > 1) {
         for (int i = 1; i < ownerChoice; i++) {
             cur = cur->next;
+            if (cur == NULL) {
+                printf("Invalid owner choice.\n");
+                return;
+            }
+
         }
     }
 
@@ -1154,7 +1183,7 @@ void enterExistingPokedexMenu()
             freePokemon(cur);
             // if we removed the only node, name should set to NULL, so check for that here
             // data is already freed, so just set the pointer to NULL, so we don't later try to reference a freed data point
-            if (cur->pokedexRoot->data->name == NULL) {
+            if (cur && cur->pokedexRoot && cur->pokedexRoot->data && cur->pokedexRoot->data->name == NULL) {
                 cur->pokedexRoot = NULL;
             }
             // edge case where there is remnant pointer left, this finds it and sets it to null
@@ -1207,10 +1236,6 @@ void mainMenu()
             openPokedexMenu();
             break;
         case MAIN_ENTER_POKEDEX_OPT:
-            if (ownerHead == NULL) {
-                printf("No existing Pokedexes.\n");
-                break;
-            }
             enterExistingPokedexMenu();
             break;
         case MAIN_DELETE_OPT:
