@@ -104,13 +104,12 @@ void sortOwners() {
         return;
     }
     // bubble sort on circular list
-    int amountOfOwners = 0;
+    int amountOfOwners = 1;
     OwnerNode *temp = ownerHead;
     while (temp->next != ownerHead) {
         amountOfOwners++;
         temp = temp->next;
     }
-    amountOfOwners++;
 
     // bubble sort on circular list
     for (int i = 0; i < amountOfOwners - 1; i++) {
@@ -126,13 +125,15 @@ void sortOwners() {
 }
 
 void swapOwnerData(OwnerNode *a, OwnerNode *b) {
-    // swap the owner name and pokedexRoot
-    a->prev->next = b;
-    b->next->prev = a;
-    b->prev = a->prev;
-    a->next = b->next;
-    a->prev = b;
-    b->next = a;
+    // Swap the owner name and pokedexRoot
+    char *tempName = a->ownerName;
+    PokemonNode *tempPokedexRoot = a->pokedexRoot;
+
+    a->ownerName = b->ownerName;
+    a->pokedexRoot = b->pokedexRoot;
+
+    b->ownerName = tempName;
+    b->pokedexRoot = tempPokedexRoot;
 }
 
 OwnerNode *findOwnerByName(const char *nameToFind) {
@@ -176,9 +177,6 @@ void mergePokedexMenu() {
     // find the two owners
     OwnerNode *firstOwner = findOwnerByName(firstUser);
     OwnerNode *secondOwner = findOwnerByName(secondUser);
-
-    free(firstUser);
-    free(secondUser);
 
     if (!firstOwner || !secondOwner) {return;}
 
@@ -229,6 +227,12 @@ void mergePokedexMenu() {
     }
     // then free itself
     free(secondOwner);
+
+    printf("Merge completed.\n");
+    printf("Owner '%s' has been removed after merging.\n", secondUser);
+
+    free(firstUser);
+    free(secondUser);
 
 }
 
@@ -487,6 +491,8 @@ void freePokemonHelper(PokemonNode **pokemonInTree, int IDToRelease) {
     // case 1: ID == currentNodeID => got it, free pokemon
     if (IDToRelease == (*pokemonInTree)->data->id) {
 
+        printf("Removing Pokemon %s (ID %d).\n", (*pokemonInTree)->data->name, IDToRelease);
+
         // case: no children to worry about assigning - just free it in place now
         if (((*pokemonInTree)->left == NULL) && ((*pokemonInTree)->right == NULL)) {
             free((*pokemonInTree)->data->name);
@@ -634,11 +640,9 @@ PokedexQueueNode* createQueueNode(PokemonNode *data) {
 
 void displayBFS(PokemonNode *root, VisitNodeFunc visit) {
     if (root == NULL) {
-        // printf("Pokedex is empty.\n");
         return;
     }
     if (root->data == NULL) {
-        // printf("Pokedex is empty.\n");
         return;
     }
     if (root->data->name == NULL) {
@@ -813,7 +817,7 @@ void openPokedexMenu() {
     printf("Your name: ");
     newOwner->ownerName = getDynamicInput();
     if (findOwnerByName(newOwner->ownerName) != NULL) {
-        printf("Owner '%s' already exists.\n", newOwner->ownerName);
+        printf("Owner '%s' already exists. Not creating a new Pokedex.\n", newOwner->ownerName);
         free(newOwner->ownerName);
         free(newOwner);
         newOwner = NULL;
@@ -1115,7 +1119,7 @@ void enterExistingPokedexMenu()
     }
 
     // list owners
-    printf("\nExisting Pokedexes (circular list):\n");
+    printf("\nExisting Pokedexes:\n");
     // print by looping through each owner - while doesn't equal head, print next etc
     printAllOwners();
 
@@ -1198,7 +1202,7 @@ void enterExistingPokedexMenu()
             break;
         case OWN_EVOLVE_OPT:
             if (cur->pokedexRoot == NULL) {
-                printf("Pokedex is empty.\n");
+                printf("Cannot evolve. Pokedex empty.\n");
                 break;
             }
             evolvePokemon(cur);
