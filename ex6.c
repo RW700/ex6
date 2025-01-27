@@ -239,6 +239,12 @@ void mergePokedexMenu() {
 void deletePokedex() {
     printf("\n=== Delete a Pokedex ===\n");
 
+    // edge case: 0 owners
+    if (ownerHead == NULL) {
+        printf("No existing Pokedexes to delete.\n");
+        return;
+    }
+
     // print by looping through each owner - while doesn't equal head, print next etc
     printAllOwners();
 
