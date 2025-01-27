@@ -136,6 +136,9 @@ void swapOwnerData(OwnerNode *a, OwnerNode *b) {
 }
 
 OwnerNode *findOwnerByName(const char *nameToFind) {
+    if (ownerHead == NULL) {
+        return NULL;
+    }
     OwnerNode *temp = ownerHead;
     do {
         if (strcmp(temp->ownerName, nameToFind) == 0) {
